@@ -118,9 +118,24 @@ public class JwtService {
             extraClaims.put("roles", roles);
         }
 
+        // CRITICAL UPDATE: Add complete user information if AuthUserDetails is used
+        if (userDetails instanceof com.shubham.backend.entity.AuthUserDetails) {
+            com.shubham.backend.entity.AuthUserDetails authUserDetails = 
+                (com.shubham.backend.entity.AuthUserDetails) userDetails;
+            com.shubham.backend.entity.User user = authUserDetails.getUser();
+            
+            // Add essential user information for frontend compatibility
+            extraClaims.put("userId", user.getUserId());        // Critical for order placement
+            extraClaims.put("username", user.getUsername());    // Actual username (not email)
+            extraClaims.put("email", user.getEmail());         // User's email
+            extraClaims.put("role", user.getRole());           // Primary role from User entity
+            extraClaims.put("hostelName", user.getHostelName()); // Additional user info
+            extraClaims.put("roomNumber", user.getRoomNumber()); // Additional user info
+        }
+
         return Jwts.builder()
                 .setClaims(extraClaims)
-                .setSubject(userDetails.getUsername())
+                .setSubject(userDetails.getUsername()) // Keep email as subject for consistency
                 .setIssuedAt(createdDate)
                 .setExpiration(expirationDate)
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
@@ -179,5 +194,26 @@ public class JwtService {
      */
     public String getHeaderName() {
         return headerName;
+    }
+
+    // UTILITY METHOD FOR FRONTEND COMPATIBILITY
+
+    /**
+     * Extract userId from token (used by OrderController)
+     * @param token JWT token
+     * @return User ID or null if not found
+     */
+    public Long extractUserId(String token) {
+        try {
+            Claims claims = extractAllClaims(token);
+            Object userId = claims.get("userId");
+            if (userId instanceof Number) {
+                return ((Number) userId).longValue();
+            }
+        } catch (Exception e) {
+            // Log error but don't throw exception
+            System.err.println("Error extracting userId from token: " + e.getMessage());
+        }
+        return null;
     }
 }

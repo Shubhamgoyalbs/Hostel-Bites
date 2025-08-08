@@ -1,79 +1,134 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect } from 'react';
+import {createContext, ReactNode, useContext, useState, useEffect} from 'react';
+import {Product} from '../types/Product';
 
-// Create the context
-const CartContext = createContext();
+// localStorage keys
+const CART_ITEMS_KEY = 'hostel-snacker-cart-items';
+const CURRENT_SELLER_KEY = 'hostel-snacker-current-seller';
 
-// Create a custom hook to use the cart context
-export const useCart = () => useContext(CartContext);
+// Helper functions for localStorage
+const saveToLocalStorage = (key: string, value: any) => {
+    try {
+        if (typeof window !== 'undefined') {
+            localStorage.setItem(key, JSON.stringify(value));
+        }
+    } catch (error) {
+        console.error('Error saving to localStorage:', error);
+    }
+};
 
-/**
- * CartProvider component to wrap the application.
- * It manages the cart state and provides functions to interact with the cart.
- * The cart state includes:
- * - cartItems: An array of product objects in the cart.
- * - currentSellerId: The ID of the seller whose products are currently in the cart.
- */
-export const CartProvider = ({ children }) => {
-    // State to hold the products in the cart
-    const [cartItems, setCartItems] = useState([]);
-    // State to hold the ID of the seller for the current cart
-    const [currentSellerId, setCurrentSellerId] = useState(null);
+const getFromLocalStorage = <T>(key: string, defaultValue: T): T => {
+    try {
+        if (typeof window !== 'undefined') {
+            const item = localStorage.getItem(key);
+            return item ? JSON.parse(item) : defaultValue;
+        }
+    } catch (error) {
+        console.error('Error loading from localStorage:', error);
+    }
+    return defaultValue;
+};
 
-    // Calculate the total price of all items in the cart
+// Cart item extends Product with quantity in cart
+interface CartItem extends Product {
+    qtyInCart: number;
+    maxQuantity: number;
+}
+
+interface CartContextType {
+    cartItems: CartItem[];
+    currentSellerId: number | null;
+    totalAmount: number;
+    addToCart: (product: Product & { maxQuantity: number }, sellerId: number) => void;
+    removeFromCart: (productId: number) => void;
+    updateQuantity: (productId: number, quantity: number) => void;
+    clearCart: () => void;
+}
+
+// Cart context for managing shopping cart state
+const CartContext = createContext<CartContextType | null>(null);
+
+// Hook to access cart context
+export const useCart = () => {
+    const context = useContext(CartContext);
+    if (!context) {
+        throw new Error('useCart must be used within a CartProvider');
+    }
+    return context;
+};
+
+// Cart provider component - manages cart state and operations
+export const CartProvider = ({children}: { children: ReactNode }) => {
+    const [cartItems, setCartItems] = useState<CartItem[]>([]);
+    const [currentSellerId, setCurrentSellerId] = useState<number | null>(null);
+    const [isLoaded, setIsLoaded] = useState(false);
+
+    // Load cart data from localStorage on component mount
+    useEffect(() => {
+        const savedCartItems = getFromLocalStorage<CartItem[]>(CART_ITEMS_KEY, []);
+        const savedSellerId = getFromLocalStorage<number | null>(CURRENT_SELLER_KEY, null);
+        
+        setCartItems(savedCartItems);
+        setCurrentSellerId(savedSellerId);
+        setIsLoaded(true);
+    }, []);
+
+    // Save cart items to localStorage whenever cartItems change
+    useEffect(() => {
+        if (isLoaded) {
+            saveToLocalStorage(CART_ITEMS_KEY, cartItems);
+        }
+    }, [cartItems, isLoaded]);
+
+    // Save current seller ID to localStorage whenever it changes
+    useEffect(() => {
+        if (isLoaded) {
+            saveToLocalStorage(CURRENT_SELLER_KEY, currentSellerId);
+        }
+    }, [currentSellerId, isLoaded]);
+
+    // Calculate total cart amount
     const totalAmount = cartItems.reduce((total, item) => total + (item.price * item.qtyInCart), 0);
 
-    /**
-     * Adds a product to the cart.
-     * Implements single-seller logic: if the new product's seller doesn't match the current cart's seller,
-     * the cart is cleared and a new cart is started with the new product.
-     * @param {object} productToAdd - The product object to add.
-     * @param {number} sellerId - The ID of the product's seller.
-     */
-    const addToCart = (productToAdd, sellerId) => {
-        // If there's no current seller or the new seller is different, clear the cart and start a new one
+    // Add product to cart (single-seller rule applies)
+    const addToCart = (productToAdd: Product & { maxQuantity: number }, sellerId: number) => {
+        // Clear cart if switching sellers
         if (currentSellerId === null || currentSellerId !== sellerId) {
-            console.log('Clearing old cart and starting a new one for a different seller.');
             setCurrentSellerId(sellerId);
-            setCartItems([{ ...productToAdd, qtyInCart: 1 }]);
+            setCartItems([{...productToAdd, qtyInCart: 1}]);
             return;
         }
 
-        // The new product's seller matches the current cart's seller.
+        // Add/update product from same seller
         setCartItems(prevItems => {
             const existingItemIndex = prevItems.findIndex(item => item.productId === productToAdd.productId);
 
             if (existingItemIndex !== -1) {
-                // Product already exists in the cart, update its quantity.
-                // We create a new array to ensure immutability.
+                // Update quantity for existing product
                 return prevItems.map((item, index) => {
                     if (index === existingItemIndex) {
-                        // Check if the quantity will exceed the max available
                         const newQty = item.qtyInCart + 1;
+                        // Check max quantity limit
                         if (newQty > productToAdd.maxQuantity) {
-                            console.warn(`Cannot add more. Max quantity for ${item.name} is ${productToAdd.maxQuantity}.`);
-                            return item; // Return the item without changing its quantity
+                            return item;
                         }
-                        return { ...item, qtyInCart: newQty };
+                        return {...item, qtyInCart: newQty};
                     }
                     return item;
                 });
             } else {
-                // Product is new to the cart, add it to the list.
-                return [...prevItems, { ...productToAdd, qtyInCart: 1 }];
+                // Add new product to cart
+                return [...prevItems, {...productToAdd, qtyInCart: 1}];
             }
         });
     };
 
-    /**
-     * Removes an item from the cart completely.
-     * @param {number} productId - The ID of the product to remove.
-     */
-    const removeFromCart = (productId) => {
+    // Remove product completely from cart
+    const removeFromCart = (productId: number) => {
         setCartItems(prevItems => {
             const updatedItems = prevItems.filter(item => item.productId !== productId);
-            // If the cart becomes empty, reset the seller ID as well
+            // Reset seller ID if cart becomes empty
             if (updatedItems.length === 0) {
                 setCurrentSellerId(null);
             }
@@ -81,27 +136,23 @@ export const CartProvider = ({ children }) => {
         });
     };
 
-    /**
-     * Updates the quantity of a product in the cart.
-     * @param {number} productId - The ID of the product to update.
-     * @param {number} quantity - The new quantity.
-     */
-    const updateQuantity = (productId, quantity) => {
+    // Update product quantity in cart
+    const updateQuantity = (productId: number, quantity: number) => {
         setCartItems(prevItems => {
-            // If the new quantity is less than 1, remove the item
+            // Remove item if quantity is less than 1
             if (quantity < 1) {
                 const updatedItems = prevItems.filter(item => item.productId !== productId);
-                // If the cart becomes empty, reset the seller ID as well
+                // Reset seller ID if cart becomes empty
                 if (updatedItems.length === 0) {
                     setCurrentSellerId(null);
                 }
                 return updatedItems;
             }
+            // Update quantity within valid range
             const updatedItems = prevItems.map(item => {
                 if (item.productId === productId) {
-                    // Ensure quantity is within valid range
                     const newQty = Math.min(quantity, item.maxQuantity);
-                    return { ...item, qtyInCart: newQty };
+                    return {...item, qtyInCart: newQty};
                 }
                 return item;
             });
@@ -109,9 +160,7 @@ export const CartProvider = ({ children }) => {
         });
     };
 
-    /**
-     * Clears the entire cart.
-     */
+    // Clear entire cart and reset seller
     const clearCart = () => {
         setCartItems([]);
         setCurrentSellerId(null);

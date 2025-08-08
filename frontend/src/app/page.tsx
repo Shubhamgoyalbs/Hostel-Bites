@@ -7,7 +7,7 @@ export default function Home() {
             <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8">
                 {/* Logo */}
                 <div className="flex justify-center mb-6">
-                    <HostelBitesLogo className="h-16 w-auto" />
+                    <HostelBitesLogo className="h-16 w-auto"/>
                 </div>
                 <h1 className="text-3xl font-bold text-center text-gray-900 mb-8">
                     Welcome

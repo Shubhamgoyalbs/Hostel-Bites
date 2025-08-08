@@ -51,7 +51,7 @@ function SellerDetailContent() {
         const fetchSellerData = async () => {
             try {
                 // Fetch seller details
-                const sellerResponse = await axios.get<SellerInfo>(`/api/api/seller/products/seller/${sellerId}`, {
+                const sellerResponse = await axios.get<SellerInfo>(`/api/seller/products/seller/${sellerId}`, {
                     headers: {
                         "Content-Type": "application/json",
                         Authorization: `Bearer ${token}`,
@@ -60,7 +60,7 @@ function SellerDetailContent() {
                 setSeller(sellerResponse.data);
 
                 // Fetch products for the seller
-                const productsResponse = await axios.get<Product[]>(`/api/api/seller/products/all/${sellerId}`, {
+                const productsResponse = await axios.get<Product[]>(`/api/seller/products/all/${sellerId}`, {
                     headers: {
                         "Content-Type": "application/json",
                         Authorization: `Bearer ${token}`,

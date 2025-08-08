@@ -1,22 +1,20 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import HostelBitesLogo from "@/components/HostelBitesLogo";
-import { Product } from "@/types/Product";
+import {useEffect, useMemo, useState} from "react";
+import {usePathname} from "next/navigation";
+import {Product} from "@/types/Product";
 import axios from "axios";
-import { useAuth } from "@/context/AuthContext";
-import { ProductCard } from "@/components/ProductCard";
+import {useAuth} from "@/context/AuthContext";
+import {ProductCard} from "@/components/ProductCard";
 import UserNavbar from "@/components/UserNavbar";
-import { LoadingPage } from "@/components/LoadingPage"; // Assuming this component exists
+import {LoadingPage} from "@/components/LoadingPage"; // Assuming this component exists
 
 export default function UserHome() {
     const [searchQuery, setSearchQuery] = useState("");
     const [products, setProducts] = useState<Product[]>([]);
     const [pageLoading, setPageLoading] = useState(true);
     const pathname = usePathname();
-    const { token, logout, loading } = useAuth();
+    const {token, logout, loading} = useAuth();
 
     // Memoize filtered products for efficient searching
     const filteredProducts = useMemo(() => {
@@ -43,7 +41,7 @@ export default function UserHome() {
         const fetchProducts = async () => {
             setPageLoading(true); // Start loading state
             try {
-                const response = await axios.get<Product[]>("http://localhost:8080/api/user/products/all", {
+                const response = await axios.get<Product[]>("/api/user/products/all", {
                     headers: {
                         "Content-Type": "application/json",
                         Authorization: `Bearer ${token}`,
@@ -71,18 +69,22 @@ export default function UserHome() {
     }, [token, loading, logout]);
 
     if (pageLoading) {
-        return <LoadingPage />;
+        return <LoadingPage/>;
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 relative overflow-hidden">
+        <div
+            className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 relative overflow-hidden">
 
-            <UserNavbar />
+            <UserNavbar/>
 
             <div className="absolute inset-0 overflow-hidden">
-                <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-3xl"></div>
-                <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-indigo-400/20 to-pink-400/20 rounded-full blur-3xl"></div>
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-cyan-400/10 to-blue-400/10 rounded-full blur-3xl"></div>
+                <div
+                    className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-3xl"></div>
+                <div
+                    className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-indigo-400/20 to-pink-400/20 rounded-full blur-3xl"></div>
+                <div
+                    className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-cyan-400/10 to-blue-400/10 rounded-full blur-3xl"></div>
             </div>
 
             <div className="pt-24 pb-8 px-4 sm:px-6 lg:px-8">
@@ -97,7 +99,8 @@ export default function UserHome() {
                     </div>
 
                     <div className="max-w-2xl mx-auto mb-12">
-                        <div className="relative backdrop-blur-lg bg-white/30 border border-white/20 rounded-2xl p-2 shadow-2xl shadow-black/10">
+                        <div
+                            className="relative backdrop-blur-lg bg-white/30 border border-white/20 rounded-2xl p-2 shadow-2xl shadow-black/10">
                             <div className="flex items-center">
                                 <div className="flex-shrink-0 pl-4">
                                     <svg
@@ -121,7 +124,8 @@ export default function UserHome() {
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     className="w-full pl-4 pr-4 py-4 bg-transparent text-gray-800 placeholder-gray-600 focus:outline-none text-lg"
                                 />
-                                <button className="flex-shrink-0 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg shadow-blue-500/25 font-medium">
+                                <button
+                                    className="flex-shrink-0 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg shadow-blue-500/25 font-medium">
                                     Search
                                 </button>
                             </div>
@@ -141,7 +145,8 @@ export default function UserHome() {
                         ) : (
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                                 {filteredProducts.map((product) => (
-                                    <ProductCard key={product.productId} product={product} productId={product.productId} />
+                                    <ProductCard key={product.productId} product={product}
+                                                 productId={product.productId}/>
                                 ))}
                             </div>
                         )}
@@ -149,7 +154,8 @@ export default function UserHome() {
 
                     {filteredProducts.length === 0 && (
                         <div className="text-center py-12">
-                            <div className="backdrop-blur-lg bg-white/30 border border-white/20 rounded-2xl p-8 shadow-2xl shadow-black/10 max-w-md mx-auto">
+                            <div
+                                className="backdrop-blur-lg bg-white/30 border border-white/20 rounded-2xl p-8 shadow-2xl shadow-black/10 max-w-md mx-auto">
                                 <div className="text-6xl mb-4">😕</div>
                                 <h3 className="text-xl font-bold text-gray-800 mb-2">No products found</h3>
                                 <p className="text-gray-600">Try searching with different keywords</p>

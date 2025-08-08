@@ -34,7 +34,7 @@ function SellersContent() {
         }
 
         filtered = filtered.filter(seller =>
-            quantityFilter >= seller.quantity
+            quantityFilter <= seller.quantity
         );
         return filtered;
     }, [sellers, searchQuery, quantityFilter]);
@@ -55,7 +55,7 @@ function SellersContent() {
         const fetchSellers = async () => {
             setPageLoading(true); // Start loading state before fetching
             try {
-                const response = await axios.get<SellerInfo[]>(`/api/api/user/sellers/${productId}`, {
+                const response = await axios.get<SellerInfo[]>(`/api/user/sellers/${productId}`, {
                     headers: {
                         "Content-Type": "application/json",
                         Authorization: `Bearer ${token}`,

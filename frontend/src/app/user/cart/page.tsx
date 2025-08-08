@@ -23,15 +23,22 @@ import {SellerInfo} from "@/types/ProductSeller";
 import {LoadingPage} from "@/components/LoadingPage";
 import axios from "axios";
 import UserNavbar from "@/components/UserNavbar";
+import { orderService } from "@/services/orderService";
+import { getUserIdFromToken } from "@/utils/jwtUtils";
+import { OrderRequestBody } from "@/types/Order";
 
 export default function CartPage() {
     const router = useRouter();
-    const {cartItems, currentSellerId, totalAmount, updateQuantity, removeFromCart, clearCart} = useCart();
+    const {cartItems, currentSellerId, totalAmount: subtotal, updateQuantity, removeFromCart, clearCart} = useCart();
     const {token, logout, loading} = useAuth();
 
     const [isPlacingOrder, setIsPlacingOrder] = useState(false);
     const [pageLoading, setPageLoading] = useState(true);
     const [currentSeller, setCurrentSeller] = useState<SellerInfo | null>(null);
+    
+    // Calculate delivery charges (4% if subtotal < 200, otherwise free)
+    const deliveryCharges = subtotal < 200 ? subtotal * 0.04 : 0;
+    const totalAmount = subtotal + deliveryCharges;
 
     // Fetch seller details when currentSellerId changes
     useEffect(() => {
@@ -48,7 +55,7 @@ export default function CartPage() {
 
             try {
                 setPageLoading(true);
-                const response = await axios.get<SellerInfo>(`/api/api/seller/products/seller/${currentSellerId}`, {
+                const response = await axios.get<SellerInfo>(`/api/seller/products/seller/${currentSellerId}`, {
                     headers: {
                         "Content-Type": "application/json",
                         Authorization: `Bearer ${token}`,
@@ -78,15 +85,71 @@ export default function CartPage() {
     };
 
     const handlePlaceOrder = async () => {
-        setIsPlacingOrder(true);
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        if (!token || !currentSellerId || !currentSeller) {
+            alert("Please login and ensure cart has valid items.");
+            return;
+        }
 
-        // Clear cart and show success
-        clearCart();
-        setIsPlacingOrder(false);
-        alert("Order placed successfully! The seller will contact you soon.");
-        router.push("/user/home");
+        setIsPlacingOrder(true);
+
+        try {
+            // Try to get userId from token, but don't fail if it's not there (for old tokens)
+            let userId = getUserIdFromToken(token);
+            
+            // If userId is not in token (old token), we'll let the backend handle it
+            // The backend will extract user info from the token or reject with 401/403
+            if (!userId) {
+                console.warn("UserId not found in token, backend will handle user identification");
+                // Use a placeholder - backend should extract real userId from token
+                userId = 0; // Backend will ignore this and use token
+            }
+
+            // Prepare order data according to backend API structure
+            const orderData: OrderRequestBody = {
+                userId: userId,
+                sellerId: currentSellerId,
+                sellerResponse: currentSeller, // Use the currentSeller data we already have
+                productId: cartItems.map(item => item.productId),
+                quantity: cartItems.map(item => item.qtyInCart),
+                price: Math.round(totalAmount * 100) / 100 // Round to 2 decimal places and convert to number
+            };
+
+            // Call the order service
+            const result = await orderService.placeOrder(orderData, token);
+
+            if (result.success) {
+                // Clear cart and show success
+                clearCart();
+                alert("Order placed successfully! The seller will contact you soon.");
+                router.push("/user/home");
+            } else {
+                // Check if it's an authentication error
+                if (result.error?.code === 'UNAUTHORIZED' || result.error?.code === 'FORBIDDEN') {
+                    alert("Your session has expired. Please login again.");
+                    logout();
+                    return;
+                }
+                
+                // Show other error messages
+                const errorMessage = result.error?.message || "Failed to place order. Please try again.";
+                alert(`Error: ${errorMessage}`);
+            }
+        } catch (error) {
+            console.error("Error placing order:", error);
+            
+            // Check if it's an axios error with 401/403 status
+            if (axios.isAxiosError(error)) {
+                if (error.response?.status === 401 || error.response?.status === 403) {
+                    alert("Your session has expired. Please login again.");
+                    logout();
+                    return;
+                }
+            }
+            
+            alert("An unexpected error occurred. Please try again.");
+        } finally {
+            setIsPlacingOrder(false);
+        }
     };
 
 
@@ -238,7 +301,7 @@ export default function CartPage() {
                                             <button
                                                 onClick={() => handleQuantityChange(item.productId, item.qtyInCart - 1)}
                                                 disabled={item.qtyInCart <= 1}
-                                                className="w-8 h-8 rounded-full bg-blue-100 hover:bg-blue-300 disabled:bg-gray-200 disabled:text-gray-300 text-blue-600 disabled:text-gray-300 flex items-center justify-center transition-colors"
+                                                className="w-8 h-8 rounded-full bg-blue-100 hover:bg-blue-300 disabled:bg-gray-200 disabled:text-gray-500 text-blue-600 disabled:text-gray-300 flex items-center justify-center transition-colors"
                                             >
                                                 <Minus className="w-4 h-4"/>
                                             </button>
@@ -247,7 +310,7 @@ export default function CartPage() {
                                             <button
                                                 onClick={() => handleQuantityChange(item.productId, item.qtyInCart + 1)}
                                                 disabled={item.qtyInCart >= item.maxQuantity}
-                                                className="w-8 h-8 rounded-full bg-blue-100 hover:bg-blue-300 disabled:bg-gray-200 disabled:text-gray-300 text-blue-600 disabled:text-gray-300 flex items-center justify-center transition-colors"
+                                                className="w-8 h-8 rounded-full bg-blue-100 hover:bg-blue-300 disabled:bg-gray-200 disabled:text-gray-500 text-blue-600 disabled:text-gray-300 flex items-center justify-center transition-colors"
                                             >
                                                 <Plus className="w-4 h-4"/>
                                             </button>
@@ -282,13 +345,24 @@ export default function CartPage() {
                             {/* Order Details */}
                             <div className="space-y-4 mb-6">
                                 <div className="flex justify-between text-gray-600">
-                                    <span>Items ({cartItems.length})</span>
-                                    <span>${totalAmount.toFixed(2)}</span>
+                                    <span>Subtotal ({cartItems.length} items)</span>
+                                    <span>${subtotal.toFixed(2)}</span>
                                 </div>
                                 <div className="flex justify-between text-gray-600">
-                                    <span>Delivery</span>
-                                    <span className="text-green-600 font-medium">Free</span>
+                                    <span>Delivery Charges</span>
+                                    {deliveryCharges === 0 ? (
+                                        <span className="text-green-600 font-medium">Free</span>
+                                    ) : (
+                                        <span className="text-orange-600 font-medium">${deliveryCharges.toFixed(2)}</span>
+                                    )}
                                 </div>
+                                {deliveryCharges > 0 && (
+                                    <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+                                        <p className="text-xs text-orange-700 text-center">
+                                            💰 Add ${(200 - subtotal).toFixed(2)} more to get free delivery!
+                                        </p>
+                                    </div>
+                                )}
                                 <div className="border-t border-gray-200 pt-4">
                                     <div className="flex justify-between text-lg font-bold text-gray-900">
                                         <span>Total</span>

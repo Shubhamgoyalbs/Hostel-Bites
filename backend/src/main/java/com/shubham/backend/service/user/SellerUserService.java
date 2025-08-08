@@ -17,7 +17,9 @@ public class SellerUserService {
 
     @Autowired
     private UserRepo userRepo;
+    @Autowired
     private ProductRepo productRepo;
+    @Autowired
     private UserProductRepo userProductRepo;
 
     public List<SellerResponse> getAllSellersForProduct(Long productId) {

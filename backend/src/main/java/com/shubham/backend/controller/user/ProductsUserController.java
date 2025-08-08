@@ -16,7 +16,6 @@ public class ProductsUserController {
     @Qualifier("userProductsService")
     private ProductsService productsService;
 
-    // Example method (to be implemented):
     @GetMapping("/all")
     public List<ProductResponse> getAllProducts() {
         return productsService.getAllProducts();
@@ -27,5 +26,4 @@ public class ProductsUserController {
         return productsService.searchProducts(name.trim());
     }
 
-    // Add more user-specific methods as needed
 }

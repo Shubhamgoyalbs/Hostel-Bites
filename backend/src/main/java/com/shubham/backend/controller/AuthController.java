@@ -100,6 +100,7 @@ public class AuthController {
         }
     }
 
+    //refresh token by providing old token
     @PostMapping("/refresh-token")
     public ResponseEntity<?> refreshToken(@RequestBody Map<String, String> request) {
         try {

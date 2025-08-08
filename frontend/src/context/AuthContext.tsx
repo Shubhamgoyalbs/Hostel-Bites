@@ -3,24 +3,22 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-// Define the shape of auth context data
 interface AuthContextType {
     token: string | null;
     role: string | null;
+    loading: boolean; // Add loading state to the context type
     login: (token: string, role: string) => void;
     logout: () => void;
 }
 
-// Create context
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Provider component
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const router = useRouter();
     const [token, setToken] = useState<string | null>(null);
     const [role, setRole] = useState<string | null>(null);
+    const [loading, setLoading] = useState(true); // Initialize loading as true
 
-    // Load token/role from localStorage when app starts
     useEffect(() => {
         const storedToken = localStorage.getItem("token");
         const storedRole = localStorage.getItem("role");
@@ -29,9 +27,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             setToken(storedToken);
             setRole(storedRole);
         }
+        setLoading(false);
     }, []);
 
-    // Store token/role in localStorage + state
     const login = (newToken: string, newRole: string) => {
         setToken(newToken);
         setRole(newRole);
@@ -39,7 +37,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         localStorage.setItem("role", newRole);
     };
 
-    // Clear everything on logout and redirect to login page
     const logout = () => {
         setToken(null);
         setRole(null);
@@ -49,13 +46,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ token, role, login, logout }}>
+        <AuthContext.Provider value={{ token, role, loading, login, logout }}>
             {children}
         </AuthContext.Provider>
     );
 };
 
-// Hook to use the auth context easily
 export const useAuth = (): AuthContextType => {
     const context = useContext(AuthContext);
     if (!context) {

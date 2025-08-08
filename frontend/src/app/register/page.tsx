@@ -96,7 +96,7 @@ export default function Register() {
 
         try {
             const response = await axios.post(
-                "http://localhost:8080/auth/register",
+                "/api/auth/register",
                 formData,
                 {
                     headers: {

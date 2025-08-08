@@ -1,14 +1,14 @@
 "use client";
 
 import {createContext, ReactNode, useContext, useState, useEffect} from 'react';
-import {Product} from '../types/Product';
+import {Product} from '@/types/Product';
 
 // localStorage keys
 const CART_ITEMS_KEY = 'hostel-snacker-cart-items';
 const CURRENT_SELLER_KEY = 'hostel-snacker-current-seller';
 
 // Helper functions for localStorage
-const saveToLocalStorage = (key: string, value: any) => {
+const saveToLocalStorage = (key: string, value: unknown) => {
     try {
         if (typeof window !== 'undefined') {
             localStorage.setItem(key, JSON.stringify(value));
@@ -18,7 +18,7 @@ const saveToLocalStorage = (key: string, value: any) => {
     }
 };
 
-const getFromLocalStorage = <T>(key: string, defaultValue: T): T => {
+const getFromLocalStorage = <T,>(key: string, defaultValue: T): T => {
     try {
         if (typeof window !== 'undefined') {
             const item = localStorage.getItem(key);
@@ -62,7 +62,7 @@ export const useCart = () => {
 export const CartProvider = ({children}: { children: ReactNode }) => {
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
     const [currentSellerId, setCurrentSellerId] = useState<number | null>(null);
-    const [isLoaded, setIsLoaded] = useState(false);
+    const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
     // Load cart data from localStorage on component mount
     useEffect(() => {

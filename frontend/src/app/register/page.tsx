@@ -1,8 +1,8 @@
 "use client";
 
-import { useRouter } from 'next/navigation';
+import {useRouter} from 'next/navigation';
 import {RegisterDetails} from "@/types/RegisterDetails"
-import { useState } from "react";
+import {useState} from "react";
 import Link from "next/link";
 import HostelBitesLogo from "@/components/HostelBitesLogo";
 import axios from "axios";
@@ -23,7 +23,7 @@ export default function Register() {
     const router = useRouter();
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const { name, value } = e.target;
+        const {name, value} = e.target;
         setFormData(prev => ({
             ...prev,
             [name]: value
@@ -105,25 +105,25 @@ export default function Register() {
                 }
             );
 
-            if(response.status == 201){
+            if (response.status == 201) {
                 console.log("Registration successful:", JSON.stringify(response.data));
                 alert("Registration successful!");
             }
             await router.push("/login");
 
-        } catch (error: any) {
-        if (error.response) {
-            console.error("Server responded with error:", error.response.data);
-            alert(
-                error.response.data.message ||
-                JSON.stringify(error.response.data) || // fallback to raw data
-                "Registration failed"
-            );
-        } else {
-            console.error("Error making request:", error.message);
-            alert("An error occurred. Please try again.");
-        }
-        }finally {
+        } catch (error: unknown) {
+            if (axios.isAxiosError(error)) {
+                console.error("Server responded with error:", error.response?.data);
+                alert(
+                    error.response?.data?.message ||
+                    JSON.stringify(error.response?.data) || // fallback to raw data
+                    "Registration failed"
+                );
+            } else {
+                console.error("Error making request:", error);
+                alert("An error occurred. Please try again.");
+            }
+        } finally {
             setIsLoading(false);
         }
     };
@@ -134,20 +134,25 @@ export default function Register() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+        <div
+            className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
             {/* Background decorative elements */}
             <div className="absolute inset-0 overflow-hidden">
-                <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-3xl"></div>
-                <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-indigo-400/20 to-pink-400/20 rounded-full blur-3xl"></div>
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-cyan-400/10 to-blue-400/10 rounded-full blur-3xl"></div>
+                <div
+                    className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-3xl"></div>
+                <div
+                    className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-indigo-400/20 to-pink-400/20 rounded-full blur-3xl"></div>
+                <div
+                    className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-cyan-400/10 to-blue-400/10 rounded-full blur-3xl"></div>
             </div>
 
             {/* Floating translucent panel */}
-            <div className="max-w-lg w-full space-y-8 relative z-10 backdrop-blur-lg bg-white/30 border border-white/20 rounded-2xl p-8 shadow-2xl shadow-black/10">
+            <div
+                className="max-w-lg w-full space-y-8 relative z-10 backdrop-blur-lg bg-white/30 border border-white/20 rounded-2xl p-8 shadow-2xl shadow-black/10">
                 <div>
                     {/* Logo */}
                     <div className="flex justify-center mb-8">
-                        <HostelBitesLogo className="h-16 w-auto" />
+                        <HostelBitesLogo className="h-16 w-auto"/>
                     </div>
                     <h2 className="mt-2 text-center text-3xl font-extrabold text-gray-800">
                         Create your account
@@ -160,7 +165,8 @@ export default function Register() {
                         >
               <span className="relative">
                 sign in to your existing account
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 transition-all duration-300 group-hover:w-full"></span>
+                <span
+                    className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 transition-all duration-300 group-hover:w-full"></span>
               </span>
                         </Link>
                     </p>
@@ -201,7 +207,7 @@ export default function Register() {
                     {/* Divider */}
                     <div className="relative">
                         <div className="absolute inset-0 flex items-center">
-                            <div className="w-full border-t border-white/30" />
+                            <div className="w-full border-t border-white/30"/>
                         </div>
                         <div className="relative flex justify-center text-sm">
                             <span className="px-2 bg-white/20 backdrop-blur-sm rounded-lg text-gray-700">Or register with email</span>
@@ -446,17 +452,21 @@ export default function Register() {
                             />
                             <label htmlFor="agree-terms" className="ml-2 block text-sm text-gray-800">
                                 I agree to the{" "}
-                                <a href="#" className="text-blue-700 hover:text-blue-600 transition-colors relative group">
+                                <a href="#"
+                                   className="text-blue-700 hover:text-blue-600 transition-colors relative group">
                   <span className="relative">
                     Terms and Conditions
-                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 transition-all duration-300 group-hover:w-full"></span>
+                    <span
+                        className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 transition-all duration-300 group-hover:w-full"></span>
                   </span>
                                 </a>{" "}
                                 and{" "}
-                                <a href="#" className="text-blue-700 hover:text-blue-600 transition-colors relative group">
+                                <a href="#"
+                                   className="text-blue-700 hover:text-blue-600 transition-colors relative group">
                   <span className="relative">
                     Privacy Policy
-                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 transition-all duration-300 group-hover:w-full"></span>
+                    <span
+                        className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 transition-all duration-300 group-hover:w-full"></span>
                   </span>
                                 </a>
                             </label>
@@ -470,7 +480,8 @@ export default function Register() {
                             >
                                 {isLoading ? (
                                     <div className="flex items-center">
-                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                                        <div
+                                            className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                                         Creating account...
                                     </div>
                                 ) : (

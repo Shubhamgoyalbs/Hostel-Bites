@@ -1,17 +1,15 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
-import Link from "next/link";
-import { useSearchParams, usePathname } from "next/navigation";
-import HostelBitesLogo from "@/components/HostelBitesLogo";
+import {useEffect, useMemo, useState, Suspense} from "react";
+import {usePathname, useSearchParams} from "next/navigation";
 import axios from "axios";
-import { useAuth } from "@/context/AuthContext";
-import { SellerInfo } from "@/types/ProductSeller";
-import { SellerCard } from "@/components/SellerCard";
+import {useAuth} from "@/context/AuthContext";
+import {SellerInfo} from "@/types/ProductSeller";
+import {SellerCard} from "@/components/SellerCard";
 import UserNavbar from "@/components/UserNavbar";
-import { LoadingPage } from "@/components/LoadingPage"; // Assuming this component exists
+import {LoadingPage} from "@/components/LoadingPage"; // Assuming this component exists
 
-export default function Sellers() {
+function SellersContent() {
     const searchParams = useSearchParams();
     const pathname = usePathname();
     const [searchQuery, setSearchQuery] = useState("");
@@ -187,5 +185,13 @@ export default function Sellers() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function Sellers() {
+    return (
+        <Suspense fallback={<LoadingPage />}>
+            <SellersContent />
+        </Suspense>
     );
 }

@@ -1,5 +1,5 @@
-import { Product } from "@/types/Product";
-import { ShoppingCart, Package } from "lucide-react";
+import {Product} from "@/types/Product";
+import {Package, ShoppingCart} from "lucide-react";
 
 interface ProductCardProps {
     product: Product;
@@ -8,9 +8,10 @@ interface ProductCardProps {
     onGoToCart: () => void;
 }
 
-export function ProductCardS({ product, isInCart, onAddToCart, onGoToCart }: ProductCardProps) {
+export function ProductCardS({product, isInCart, onAddToCart, onGoToCart}: ProductCardProps) {
     return (
-        <div className="bg-white rounded-xl p-4 shadow-md border border-blue-100 hover:shadow-lg transition-all duration-300 hover:border-blue-300">
+        <div
+            className="bg-white rounded-xl p-4 shadow-md border border-blue-100 hover:shadow-lg transition-all duration-300 hover:border-blue-300">
             {/* Product Image */}
             <div className="aspect-square bg-gray-100 rounded-lg mb-4 overflow-hidden">
                 {product.imageUrl ? (
@@ -20,8 +21,9 @@ export function ProductCardS({ product, isInCart, onAddToCart, onGoToCart }: Pro
                         className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                     />
                 ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100">
-                        <Package className="w-12 h-12 text-blue-400" />
+                    <div
+                        className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100">
+                        <Package className="w-12 h-12 text-blue-400"/>
                     </div>
                 )}
             </div>
@@ -49,7 +51,8 @@ export function ProductCardS({ product, isInCart, onAddToCart, onGoToCart }: Pro
                             : "bg-blue-500 hover:bg-blue-600 text-white hover:shadow-lg hover:shadow-blue-500/30"
                     }`}
                 >
-                    <ShoppingCart className="w-4 h-4 transition-all duration-500 group-hover/btn:rotate-[360deg] group-hover/btn:animate-bounce" />
+                    <ShoppingCart
+                        className="w-4 h-4 transition-all duration-500 group-hover/btn:rotate-[360deg] group-hover/btn:animate-bounce"/>
                     {isInCart ? "Go to Cart" : "Add to Cart"}
                 </button>
             </div>

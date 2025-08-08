@@ -1,4 +1,4 @@
-import { Loader2, ShoppingBag, Users, Package } from "lucide-react";
+import {Loader2, Package, ShoppingBag, Users} from "lucide-react";
 
 interface LoadingPageProps {
     message?: string;
@@ -21,21 +21,27 @@ export function LoadingPage({
                     {/* Outer rotating ring */}
                     <div className="w-24 h-24 mx-auto relative">
                         <div className="absolute inset-0 border-4 border-blue-200 rounded-full animate-spin">
-                            <div className="absolute top-0 left-1/2 w-2 h-2 bg-blue-600 rounded-full -translate-x-1/2 -translate-y-1"></div>
+                            <div
+                                className="absolute top-0 left-1/2 w-2 h-2 bg-blue-600 rounded-full -translate-x-1/2 -translate-y-1"></div>
                         </div>
 
                         {/* Inner pulsing circle */}
-                        <div className="absolute inset-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center animate-pulse">
-                            <ShoppingBag className="w-6 h-6 text-white" />
+                        <div
+                            className="absolute inset-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center animate-pulse">
+                            <ShoppingBag className="w-6 h-6 text-white"/>
                         </div>
                     </div>
 
                     {/* Floating icons */}
-                    <div className="absolute -top-4 -left-4 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center animate-bounce" style={{ animationDelay: '0.5s' }}>
-                        <Users className="w-4 h-4 text-blue-600" />
+                    <div
+                        className="absolute -top-4 -left-4 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center animate-bounce"
+                        style={{animationDelay: '0.5s'}}>
+                        <Users className="w-4 h-4 text-blue-600"/>
                     </div>
-                    <div className="absolute -top-4 -right-4 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center animate-bounce" style={{ animationDelay: '1s' }}>
-                        <Package className="w-4 h-4 text-blue-600" />
+                    <div
+                        className="absolute -top-4 -right-4 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center animate-bounce"
+                        style={{animationDelay: '1s'}}>
+                        <Package className="w-4 h-4 text-blue-600"/>
                     </div>
                 </div>
 
@@ -50,8 +56,10 @@ export function LoadingPage({
                 {/* Progress Dots */}
                 <div className="flex items-center justify-center space-x-2 mb-8">
                     <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
-                    <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-                    <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+                    <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"
+                         style={{animationDelay: '0.2s'}}></div>
+                    <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"
+                         style={{animationDelay: '0.4s'}}></div>
                 </div>
 
                 {/* Loading Stats Skeleton */}
@@ -79,7 +87,7 @@ export function LoadingPage({
                 {/* Loading Messages */}
                 <div className="text-sm text-gray-500 space-y-1">
                     <div className="flex items-center justify-center gap-2">
-                        <Loader2 className="w-3 h-3 animate-spin" />
+                        <Loader2 className="w-3 h-3 animate-spin"/>
                         <span>Fetching data...</span>
                     </div>
                     <div className="text-xs text-gray-400">

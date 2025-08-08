@@ -1,4 +1,4 @@
-import { Product } from '@/types/Product';
+import {Product} from '@/types/Product';
 import {useRouter} from "next/navigation";
 
 interface ProductCardProps {
@@ -6,11 +6,11 @@ interface ProductCardProps {
     productId: number;
 }
 
-export function ProductCard({ product, productId }: ProductCardProps) {
+export function ProductCard({product, productId}: ProductCardProps) {
 
     const router = useRouter();
 
-    function handelSellerClick(){
+    function handelSellerClick() {
 
         const query = new URLSearchParams({
             product: product.name,
@@ -23,7 +23,8 @@ export function ProductCard({ product, productId }: ProductCardProps) {
     }
 
     return (
-        <div className="group relative bg-white  rounded-2xl shadow-sm border border-gray-200  overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+        <div
+            className="group relative bg-white  rounded-2xl shadow-sm border border-gray-200  overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
             {/* Product Image */}
             <div className="aspect-square overflow-hidden bg-gray-100 ">
                 <img
@@ -40,11 +41,13 @@ export function ProductCard({ product, productId }: ProductCardProps) {
                         {product.name}
                     </h3>
                     {product.quantity <= 0 ? (
-                        <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-green-100 text-green-800 ">
+                        <span
+                            className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-green-100 text-green-800 ">
               In Stock
             </span>
                     ) : (
-                        <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-red-100 text-red-800">
+                        <span
+                            className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-red-100 text-red-800">
               Out of Stock
             </span>
                     )}

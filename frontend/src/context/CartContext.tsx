@@ -100,7 +100,7 @@ export const CartProvider = ({children}: { children: ReactNode }) => {
             return;
         }
 
-        // Add/update product from same seller
+        // Add/update product from the same seller
         setCartItems(prevItems => {
             const existingItemIndex = prevItems.findIndex(item => item.productId === productToAdd.productId);
 
@@ -160,7 +160,7 @@ export const CartProvider = ({children}: { children: ReactNode }) => {
         });
     };
 
-    // Clear entire cart and reset seller
+    // Clear the entire cart and reset seller
     const clearCart = () => {
         setCartItems([]);
         setCurrentSellerId(null);

@@ -1,7 +1,7 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import {createContext, useContext, useEffect, useState} from "react";
+import {useRouter} from "next/navigation";
 
 interface AuthContextType {
     token: string | null;
@@ -13,7 +13,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+export const AuthProvider = ({children}: { children: React.ReactNode }) => {
     const router = useRouter();
     const [token, setToken] = useState<string | null>(null);
     const [role, setRole] = useState<string | null>(null);
@@ -46,7 +46,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ token, role, loading, login, logout }}>
+        <AuthContext.Provider value={{token, role, loading, login, logout}}>
             {children}
         </AuthContext.Provider>
     );

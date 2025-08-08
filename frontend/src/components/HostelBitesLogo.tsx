@@ -2,32 +2,32 @@ interface HostelBitesLogoProps {
     className?: string;
 }
 
-export default function HostelBitesLogo({ className = "h-16 w-auto" }: HostelBitesLogoProps) {
+export default function HostelBitesLogo({className = "h-16 w-auto"}: HostelBitesLogoProps) {
     return (
         <svg
             viewBox="0 0 300 80"
             className={className}
             xmlns="http://www.w3.org/2000/svg"
-            style={{ backgroundColor: 'transparent' }}
+            style={{backgroundColor: 'transparent'}}
         >
             <defs>
                 {/* Main gradient for the badge */}
                 <linearGradient id="badgeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#FF6B6B" />
-                    <stop offset="50%" stopColor="#4ECDC4" />
-                    <stop offset="100%" stopColor="#45B7D1" />
+                    <stop offset="0%" stopColor="#FF6B6B"/>
+                    <stop offset="50%" stopColor="#4ECDC4"/>
+                    <stop offset="100%" stopColor="#45B7D1"/>
                 </linearGradient>
 
                 {/* Text gradient */}
                 <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor="#2D3748" />
-                    <stop offset="100%" stopColor="#1A202C" />
+                    <stop offset="0%" stopColor="#2D3748"/>
+                    <stop offset="100%" stopColor="#1A202C"/>
                 </linearGradient>
 
                 {/* Accent gradient */}
                 <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor="#667EEA" />
-                    <stop offset="100%" stopColor="#764BA2" />
+                    <stop offset="0%" stopColor="#667EEA"/>
+                    <stop offset="100%" stopColor="#764BA2"/>
                 </linearGradient>
 
                 {/* Glow effect */}

@@ -42,14 +42,20 @@ public class OrderSellerService {
     }
 
     public List<OrderResponseBody> getAllOrdersForSeller(Long sellerId) {
-        List<OrderUs> orders = orderUSRepo.findAllByUser_UserId(sellerId);
+        List<OrderUs> orders = orderUSRepo.findAllBySeller_UserId(sellerId);
 
         return orders.stream().map(orderUs -> {
             OrderResponseBody response = new OrderResponseBody();
             response.setOrderId(orderUs.getId());
             response.setPrice(orderUs.getPrice());
-            response.setAccepted(Boolean.TRUE.equals(orderUs.getIsCompleted()));
-            response.setCompleted(Boolean.TRUE.equals(orderUs.getIsAccepted()));
+
+            boolean isAccepted = Boolean.TRUE.equals(orderUs.getIsAccepted());
+            boolean isCompleted = Boolean.TRUE.equals(orderUs.getIsCompleted());
+
+            System.out.println("Order ID: " + orderUs.getId() + ", isAccepted DB: " + orderUs.getIsAccepted() + ", mapped: " + isAccepted);
+
+            response.setAccepted(isAccepted);
+            response.setCompleted(isCompleted);
 
             SellerResponse userResp = getSellerResponse(orderUs);
             response.setUser(userResp);
@@ -74,29 +80,57 @@ public class OrderSellerService {
 
     @Transactional
     public boolean acceptOrder(Long orderId) {
-        OrderUs orderUs = orderUSRepo.findById(orderId).orElse(null);
-        if (orderUs == null || Boolean.TRUE.equals(orderUs.getIsAccepted())) return false;
-        orderUs.setIsAccepted(true);
+        try {
+            System.out.println("Attempting to accept order with ID: " + orderId);
 
-        // Reduce quantity logic
-        List<Order> orderItems = orderRepo.findAllByOrder_Id(orderId);
-        for (Order orderItem : orderItems) {
-            // Find the buyer's UserProduct row for this product
-            UserProduct userProduct = (UserProduct) userProductRepo.findByUser_UserIdAndProduct_ProductId(
-                    orderUs.getUser().getUserId(), orderItem.getProduct().getProductId()
-            ).orElseThrow(() -> new RuntimeException("Product not found "));
-            if (userProduct != null) {
-                int currentQty = userProduct.getQuantity();
-                int newQty = currentQty - orderItem.getQuantity();
-                if (newQty < 0)
-                    throw new IllegalStateException("Not enough quantity for product: " + orderItem.getProduct().getName());
-                userProduct.setQuantity(newQty);
-                userProductRepo.save(userProduct);
+            OrderUs orderUs = orderUSRepo.findById(orderId).orElse(null);
+            if (orderUs == null) {
+                System.out.println("Order not found with ID: " + orderId);
+                return false;
             }
-        }
 
-        orderUSRepo.save(orderUs);
-        return true;
+            if (Boolean.TRUE.equals(orderUs.getIsAccepted())) {
+                System.out.println("Order " + orderId + " is already accepted");
+                return true; // Return true for idempotent operation
+            }
+
+            System.out.println("Order found - Seller ID: " + orderUs.getSeller().getUserId());
+            orderUs.setIsAccepted(true);
+
+            // Reduce quantity logic - reduce from SELLER's inventory, not buyer's
+            List<Order> orderItems = orderRepo.findAllByOrder_Id(orderId);
+            System.out.println("Found " + orderItems.size() + " order items");
+
+            for (Order orderItem : orderItems) {
+                System.out.println("Processing order item - Product ID: " + orderItem.getProduct().getProductId() + ", Quantity: " + orderItem.getQuantity());
+
+                // Find the SELLER's UserProduct row for this product (seller's inventory)
+                UserProduct sellerProduct = userProductRepo.findByUser_UserIdAndProduct_ProductId(
+                        orderUs.getSeller().getUserId(), orderItem.getProduct().getProductId()
+                ).orElseThrow(() -> new RuntimeException("Product not found in seller's inventory. Seller ID: " + orderUs.getSeller().getUserId() + ", Product ID: " + orderItem.getProduct().getProductId()));
+
+                System.out.println("Seller has " + sellerProduct.getQuantity() + " units in inventory");
+
+                int currentQty = sellerProduct.getQuantity();
+                int newQty = currentQty - orderItem.getQuantity();
+                if (newQty < 0) {
+                    String errorMsg = "Not enough quantity for product: " + orderItem.getProduct().getName() + ". Available: " + currentQty + ", Requested: " + orderItem.getQuantity();
+                    System.out.println(errorMsg);
+                    throw new IllegalStateException(errorMsg);
+                }
+                sellerProduct.setQuantity(newQty);
+                userProductRepo.save(sellerProduct);
+                System.out.println("Updated inventory for product " + orderItem.getProduct().getName() + " from " + currentQty + " to " + newQty);
+            }
+
+            orderUSRepo.save(orderUs);
+            System.out.println("Order " + orderId + " accepted successfully");
+            return true;
+        } catch (Exception e) {
+            System.err.println("Error accepting order " + orderId + ": " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
     }
 
 

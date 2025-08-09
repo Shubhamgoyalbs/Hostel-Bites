@@ -22,7 +22,7 @@ public class ProductsSellerController {
         return productsSellerService.getAllListedProducts(sellerId);
     }
 
-    @GetMapping("nonListedProducts/{sellerId}")
+    @GetMapping("/nonListedProducts/{sellerId}")
     public List<ProductResponse> getAllNonListedProducts(@PathVariable Long sellerId) {
         return productsSellerService.getAllNonListedProducts(sellerId);
     }

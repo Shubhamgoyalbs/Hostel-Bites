@@ -30,7 +30,7 @@ public class OrderController {
         if (request == null) {
             return ResponseEntity.badRequest().body("order must be valid");
         }
-        
+
         try {
             // If userId is 0 or null (old token), extract it from JWT
             if (request.getUserId() == null || request.getUserId() == 0) {
@@ -38,7 +38,7 @@ public class OrderController {
                 if (authHeader != null && authHeader.startsWith("Bearer ")) {
                     String token = authHeader.substring(7); // Remove "Bearer " prefix
                     Long userIdFromToken = jwtService.extractUserId(token);
-                    
+
                     if (userIdFromToken != null) {
                         request.setUserId(userIdFromToken);
                     } else {
@@ -55,10 +55,10 @@ public class OrderController {
                     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authorization header missing");
                 }
             }
-            
+
             String result = orderService.placeOrder(request);
             return ResponseEntity.ok(result);
-            
+
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body("Server error please try again later");

@@ -2,6 +2,7 @@
  * Order Service - Handles order-related API calls
  */
 
+import api from '@/utils/axios';
 import axios, { AxiosError } from 'axios';
 import { OrderRequestBody, OrderResponseBody, PlaceOrderResult } from '@/types/Order';
 
@@ -16,14 +17,10 @@ export class OrderService {
      */
     async placeOrder(orderData: OrderRequestBody, token: string): Promise<PlaceOrderResult> {
         try {
-            const response = await axios.post<string>(
+            const response = await api.post<string>(
                 `${this.baseURL}/placeOrder`,
                 orderData,
                 {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`,
-                    },
                     timeout: 30000, // 30 seconds timeout
                 }
             );
@@ -55,13 +52,9 @@ export class OrderService {
      */
     async getAllOrders(userId: number, token: string): Promise<OrderResponseBody[]> {
         try {
-            const response = await axios.get<OrderResponseBody[]>(
+            const response = await api.get<OrderResponseBody[]>(
                 `${this.baseURL}/allOrders/${userId}`,
                 {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`,
-                    },
                     timeout: 15000, // 15 seconds timeout
                 }
             );

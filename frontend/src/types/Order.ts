@@ -4,8 +4,15 @@
 
 import { SellerInfo } from './ProductSeller';
 
+// ORBProduct matches backend ORBProduct class
+export interface ORBProduct {
+    productName: string;
+    quantity: number;
+    price: number;
+}
+
 export interface OrderRequestBody {
-    userId: number;
+    userId: number | null;
     sellerId: number;
     sellerResponse: SellerInfo;
     productId: number[];
@@ -13,16 +20,15 @@ export interface OrderRequestBody {
     price: number;
 }
 
+// OrderResponseBody matches backend OrderResponseBody class
 export interface OrderResponseBody {
     orderId: number;
-    userId: number;
-    sellerId: number;
-    sellerResponse: SellerInfo;
-    productId: number[];
-    quantity: number[];
     price: number;
-    status: string;
-    orderDate: string;
+    seller: SellerInfo | null;
+    user: SellerInfo | null;
+    completed: boolean;
+    accepted: boolean;
+    products: ORBProduct[];
 }
 
 export interface PlaceOrderError {

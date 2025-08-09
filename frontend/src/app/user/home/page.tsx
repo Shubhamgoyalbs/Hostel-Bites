@@ -3,10 +3,10 @@
 import {useEffect, useMemo, useState} from "react";
 import {usePathname} from "next/navigation";
 import {Product} from "@/types/Product";
-import axios from "axios";
+import api from "@/utils/axios";
 import {useAuth} from "@/context/AuthContext";
-import {ProductCard} from "@/components/ProductCard";
-import UserNavbar from "@/components/UserNavbar";
+import {ProductCard} from "@/components/user/ProductCard";
+import UserNavbar from "@/components/user/UserNavbar";
 import {LoadingPage} from "@/components/LoadingPage"; // Assuming this component exists
 
 export default function UserHome() {
@@ -41,12 +41,7 @@ export default function UserHome() {
         const fetchProducts = async () => {
             setPageLoading(true); // Start loading state
             try {
-                const response = await axios.get<Product[]>("/api/user/products/all", {
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
+                const response = await api.get<Product[]>("/api/user/products/all");
 
                 if (response.status === 200 || response.status === 201) {
                     setProducts(response.data);
@@ -55,9 +50,7 @@ export default function UserHome() {
                 }
             } catch (error) {
                 console.error("Failed to fetch products", error);
-                if (axios.isAxiosError(error) && (error.response?.status === 403 || error.response?.status === 401)) {
-                    logout();
-                }
+                // Error handling is now done by axios interceptor
             } finally {
                 setPageLoading(false); // End loading state regardless of outcome
             }

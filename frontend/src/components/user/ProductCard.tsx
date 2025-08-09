@@ -40,7 +40,7 @@ export function ProductCard({product, productId}: ProductCardProps) {
                     <h3 className="font-semibold w-[160px] text-lg text-gray-900  line-clamp-1">
                         {product.name}
                     </h3>
-                    {product.quantity <= 0 ? (
+                    {product.quantity > 0 ? (
                         <span
                             className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-green-100 text-green-800 ">
               In Stock

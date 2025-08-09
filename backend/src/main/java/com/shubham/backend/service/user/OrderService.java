@@ -120,6 +120,13 @@ public class OrderService {
                 OrderResponseBody response = new OrderResponseBody();
                 response.setOrderId(orderUs.getId());
                 response.setPrice(orderUs.getPrice());
+                
+                boolean isAccepted = Boolean.TRUE.equals(orderUs.getIsAccepted());
+                boolean isCompleted = Boolean.TRUE.equals(orderUs.getIsCompleted());
+                
+                response.setAccepted(isAccepted);
+                response.setCompleted(isCompleted);
+                
                 SellerResponse seller = getSellerResponse(orderUs);
 
                 List<Order> orders = orderRepo.findAllByOrder_Id(orderUs.getId());

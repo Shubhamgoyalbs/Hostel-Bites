@@ -5,6 +5,7 @@ import {RegisterDetails} from "@/types/RegisterDetails"
 import {useState} from "react";
 import Link from "next/link";
 import HostelBitesLogo from "@/components/HostelBitesLogo";
+import api from "@/utils/axios";
 import axios from "axios";
 
 export default function Register() {
@@ -95,14 +96,9 @@ export default function Register() {
         setIsLoading(true);
 
         try {
-            const response = await axios.post(
-                "/api/auth/register",
-                formData,
-                {
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                }
+            const response = await api.post(
+                "/auth/register",
+                formData
             );
 
             if (response.status == 201) {
@@ -394,7 +390,7 @@ export default function Register() {
                                     value={formData.roomNo}
                                     onChange={handleInputChange}
                                     className={`peer w-full px-3 pt-6 pb-2 border ${
-                                        errors.roomNumber ? 'border-red-400' : 'border-white/30'
+                                        errors.roomNo ? 'border-red-400' : 'border-white/30'
                                     } text-gray-800 bg-white/20 backdrop-blur-sm rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all duration-200`}
                                     placeholder=" "
                                 />
@@ -408,7 +404,7 @@ export default function Register() {
                                     Room Number
                                 </label>
                                 {errors.roomNo && (
-                                    <p className="mt-1 text-sm text-red-600">{errors.roomNumber}</p>
+                                    <p className="mt-1 text-sm text-red-600">{errors.roomNo}</p>
                                 )}
                             </div>
 

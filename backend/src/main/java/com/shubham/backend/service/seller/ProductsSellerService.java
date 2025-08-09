@@ -37,16 +37,39 @@ public class ProductsSellerService {
     }
 
     public List<ProductResponse> getAllListedProducts(Long sellerId) {
-
-        List<UserProduct> users = userProductRepo.findAllByUser_UserId(sellerId);
-
+        // Get products that are in seller's inventory (listed = true or have quantity > 0)
+        List<UserProduct> users = userProductRepo.findAllByUser_UserIdAndListed(sellerId, true);
         return getProductResponses(users);
     }
 
     public List<ProductResponse> getAllNonListedProducts(Long sellerId) {
-        List<UserProduct> users = userProductRepo.findAllByUser_UserIdAndListed(sellerId, false);
-
-        return getProductResponses(users);
+        // Get all products from the system
+        List<Product> allProducts = productRepo.findAll();
+        
+        // Get only the products that seller has LISTED (listed = true)
+        List<UserProduct> listedSellerProducts = userProductRepo.findAllByUser_UserIdAndListed(sellerId, true);
+        
+        // Get list of product IDs that seller has already LISTED
+        List<Long> listedProductIds = listedSellerProducts.stream()
+                .map(up -> up.getProduct().getProductId())
+                .toList();
+        
+        // Filter products that seller hasn't listed yet
+        List<Product> nonListedProducts = allProducts.stream()
+                .filter(product -> !listedProductIds.contains(product.getProductId()))
+                .toList();
+        
+        // Convert to ProductResponse (with quantity 0 since seller doesn't have them yet)
+        return nonListedProducts.stream().map(product -> {
+            ProductResponse productResponse = new ProductResponse();
+            productResponse.setProductId(product.getProductId());
+            productResponse.setName(product.getName());
+            productResponse.setPrice(product.getPrice());
+            productResponse.setDescription(product.getDescription());
+            productResponse.setImageUrl(product.getImageUrl());
+            productResponse.setQuantity(0); // Seller doesn't have this product yet
+            return productResponse;
+        }).toList();
     }
 
     public String addProducts(long[] productIds, Long sellerId) {
@@ -55,13 +78,25 @@ public class ProductsSellerService {
                     .orElseThrow(() -> new RuntimeException("Seller not found with id: " + sellerId));
 
             for (Long productId : productIds) {
-                UserProduct userProduct = new UserProduct();
-                Product product = productRepo.findById(productId)
-                        .orElseThrow(() -> new RuntimeException("Product not found with id: " + productId));
-                userProduct.setUser(seller);
-                userProduct.setProduct(product);
-                userProduct.setQuantity(0);
-                userProductRepo.save(userProduct);
+                // Check if seller already has this product (regardless of listed status)
+                var existingProduct = userProductRepo.findByUser_UserIdAndProduct_ProductId(sellerId, productId);
+                
+                if (existingProduct.isPresent()) {
+                    // If product exists but is not listed, just mark it as listed
+                    UserProduct existing = existingProduct.get();
+                    existing.setListed(true);
+                    userProductRepo.save(existing);
+                } else {
+                    // Create new UserProduct entry
+                    UserProduct userProduct = new UserProduct();
+                    Product product = productRepo.findById(productId)
+                            .orElseThrow(() -> new RuntimeException("Product not found with id: " + productId));
+                    userProduct.setUser(seller);
+                    userProduct.setProduct(product);
+                    userProduct.setQuantity(1); // Set default quantity to 1
+                    userProduct.setListed(true); // Mark as listed when added
+                    userProductRepo.save(userProduct);
+                }
             }
 
             return "Products added successfully";
@@ -72,7 +107,7 @@ public class ProductsSellerService {
 
     public String deleteProductFromSeller(Long productId, Long sellerId) {
         try {
-            UserProduct userProduct = (UserProduct) userProductRepo.findByUser_UserIdAndProduct_ProductId(sellerId, productId)
+            UserProduct userProduct = userProductRepo.findByUser_UserIdAndProduct_ProductId(sellerId, productId)
                     .orElseThrow(() -> new RuntimeException("Product not found for seller with id: " + sellerId));
 
             userProductRepo.delete(userProduct);
@@ -82,9 +117,9 @@ public class ProductsSellerService {
         }
     }
 
-    public String updateProduct(Integer updatedQuantity, Long productId, Long sellerId) {
+    public String updateProduct(Integer updatedQuantity, Long sellerId, Long productId) {
         try {
-            UserProduct userProduct = (UserProduct) userProductRepo.findByUser_UserIdAndProduct_ProductId(sellerId, productId)
+            UserProduct userProduct = userProductRepo.findByUser_UserIdAndProduct_ProductId(sellerId, productId)
                     .orElseThrow(() -> new RuntimeException("Product not found for seller with id: " + sellerId));
             userProduct.setQuantity(updatedQuantity);
             userProductRepo.save(userProduct);

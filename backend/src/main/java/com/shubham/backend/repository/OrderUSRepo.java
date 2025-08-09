@@ -9,4 +9,6 @@ public interface OrderUSRepo extends JpaRepository<OrderUs, Long> {
     OrderUs findByUser_UserIdAndSeller_UserId(Long userUserId, Long sellerUserId);
 
     List<OrderUs> findAllByUser_UserId(Long userUserId);
+    
+    List<OrderUs> findAllBySeller_UserId(Long sellerUserId);
 }

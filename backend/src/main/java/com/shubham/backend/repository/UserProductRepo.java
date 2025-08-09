@@ -14,5 +14,5 @@ public interface UserProductRepo extends JpaRepository<UserProduct, Long> {
 
     List<UserProduct> findAllByUser_UserIdAndListed(Long sellerId, boolean b);
 
-    <T> ScopedValue<T> findByUser_UserIdAndProduct_ProductId(Long sellerId, Long productId);
+    java.util.Optional<UserProduct> findByUser_UserIdAndProduct_ProductId(Long sellerId, Long productId);
 }

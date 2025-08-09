@@ -24,9 +24,18 @@ public class OrderSellerController {
 
     @PutMapping("/accept/{orderId}")
     public ResponseEntity<String> acceptOrder(@PathVariable Long orderId) {
-        boolean updated = orderSellerService.acceptOrder(orderId);
-        if (updated) return ResponseEntity.ok("Order accepted.");
-        else return ResponseEntity.badRequest().body("Order not found or already accepted.");
+        try {
+            boolean result = orderSellerService.acceptOrder(orderId);
+            if (result) {
+                return ResponseEntity.ok("Order accepted successfully.");
+            } else {
+                return ResponseEntity.badRequest().body("Order not found.");
+            }
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("An error occurred while accepting the order.");
+        }
     }
 
     @PutMapping("/complete/{orderId}")

@@ -5,7 +5,7 @@ import Link from "next/link";
 import {usePathname} from "next/navigation";
 import HostelBitesLogo from "@/components/HostelBitesLogo";
 
-export default function UserNavbar() {
+export default function SellerNavbar() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const pathname = usePathname();
 
@@ -49,21 +49,13 @@ export default function UserNavbar() {
 
                 {/* Desktop Navigation Links */}
                 <div className="hidden md:flex absolute left-1/2 transform -translate-x-1/2 items-center space-x-8">
-                    <NavLink href="/user/home">Home</NavLink>
+                    <NavLink href="/seller/home">Home</NavLink>
                     <NavLink href="/login">Login</NavLink>
-                    <NavLink href="/user/orders">Orders</NavLink>
+                    <NavLink href="/seller/orders">Orders</NavLink>
                 </div>
 
                 {/* Desktop Right Side - Cart and Profile */}
                 <div className="hidden md:flex items-center space-x-3">
-                    <Link href="/user/cart"
-                          className="flex items-center justify-center w-10 h-10 bg-white/30 backdrop-blur-sm rounded-xl hover:bg-white/40 transition-all duration-200 group border border-white/20">
-                        <svg className="w-5 h-5 text-gray-700 group-hover:text-blue-600 transition-colors" fill="none"
-                             stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                  d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.68 3.4a1 1 0 00.9 1.6h9.78M7 13v6a2 2 0 002 2h4a2 2 0 002-2v-6m-6 0a2 2 0 012-2h2a2 2 0 012 2"/>
-                        </svg>
-                    </Link>
                     <Link href="/user/profile" className="flex items-center group">
                         <div
                             className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl flex items-center justify-center text-white font-bold group-hover:scale-105 transition-transform duration-200 shadow-lg">
@@ -96,17 +88,7 @@ export default function UserNavbar() {
                     <div className="p-3 space-y-1 ">
                         <NavLink href="/user/home" isMobile={true}>Home</NavLink>
                         <NavLink href="/login" isMobile={true}>Login</NavLink>
-                        <NavLink href="/register" isMobile={true}>Register</NavLink>
                         <NavLink href="/user/orders" isMobile={true}>Orders</NavLink>
-
-                        <Link href="/user/cart"
-                              className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition-colors font-medium py-2 px-2 rounded-lg hover:bg-white/40">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                      d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.68 3.4a1 1 0 00.9 1.6h9.78M7 13v6a2 2 0 002 2h4a2 2 0 002-2v-6m-6 0a2 2 0 012-2h2a2 2 0 012 2"/>
-                            </svg>
-                            <span>Cart</span>
-                        </Link>
 
                         <Link href="/user/profile"
                               className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition-colors font-medium py-2 px-2 rounded-lg hover:bg-white/40">

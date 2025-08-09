@@ -3,6 +3,7 @@
 import {useState} from "react";
 import Link from "next/link";
 import HostelBitesLogo from "@/components/HostelBitesLogo";
+import api from "@/utils/axios";
 import axios from "axios";
 import {useRouter} from "next/navigation";
 import {useAuth} from "@/context/AuthContext";
@@ -59,14 +60,9 @@ export default function Login() {
         setIsLoading(true);
 
         try {
-            const response = await axios.post(
-                "/api/auth/login",
-                formData,
-                {
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                }
+            const response = await api.post(
+                "/auth/login",
+                formData
             );
 
             if (response.status == 201 || response.status == 200) {
@@ -80,8 +76,10 @@ export default function Login() {
                     router.push("/admin/dashboard");
                 } else if (role === "USER") {
                     router.push("/user/home");
-                } else {
-                    router.push("/");
+                } else if (role === "SELLER") {
+                    router.push("/seller/home");
+                }else {
+                    router.push("/")
                 }
             }
 

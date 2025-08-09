@@ -2,11 +2,12 @@
 
 import {useEffect, useMemo, useState, Suspense} from "react";
 import {usePathname, useSearchParams} from "next/navigation";
+import api from "@/utils/axios";
 import axios from "axios";
 import {useAuth} from "@/context/AuthContext";
 import {SellerInfo} from "@/types/ProductSeller";
-import {SellerCard} from "@/components/SellerCard";
-import UserNavbar from "@/components/UserNavbar";
+import {SellerCard} from "@/components/user/SellerCard";
+import UserNavbar from "@/components/user/UserNavbar";
 import {LoadingPage} from "@/components/LoadingPage"; // Assuming this component exists
 
 function SellersContent() {
@@ -55,12 +56,7 @@ function SellersContent() {
         const fetchSellers = async () => {
             setPageLoading(true); // Start loading state before fetching
             try {
-                const response = await axios.get<SellerInfo[]>(`/api/user/sellers/${productId}`, {
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
+                const response = await api.get<SellerInfo[]>(`/api/user/sellers/${productId}`);
 
                 if (response.status === 200 || response.status === 201) {
                     setSellers(response.data);

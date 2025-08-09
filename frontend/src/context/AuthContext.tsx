@@ -2,6 +2,7 @@
 
 import {createContext, useContext, useEffect, useState} from "react";
 import {useRouter} from "next/navigation";
+import { getUserPrimaryRoleFromToken, isTokenExpired } from "@/utils/jwtUtils";
 
 interface AuthContextType {
     token: string | null;
@@ -21,27 +22,48 @@ export const AuthProvider = ({children}: { children: React.ReactNode }) => {
 
     useEffect(() => {
         const storedToken = localStorage.getItem("token");
-        const storedRole = localStorage.getItem("role");
 
-        if (storedToken && storedRole) {
-            setToken(storedToken);
-            setRole(storedRole);
+        if (storedToken) {
+            // Check if token is expired
+            if (isTokenExpired(storedToken)) {
+                // Clean up expired token
+                localStorage.removeItem("token");
+                localStorage.removeItem("role"); // Clean up old role storage
+                setLoading(false);
+                return;
+            }
+
+            // Extract role from JWT token
+            const roleFromToken = getUserPrimaryRoleFromToken(storedToken);
+            
+            if (roleFromToken) {
+                setToken(storedToken);
+                setRole(roleFromToken);
+                // Remove old role from localStorage if it exists
+                localStorage.removeItem("role");
+            }
         }
         setLoading(false);
     }, []);
 
-    const login = (newToken: string, newRole: string) => {
+    const login = (newToken: string, newRole?: string) => {
         setToken(newToken);
-        setRole(newRole);
+        
+        // Extract role from token if not provided
+        const roleFromToken = newRole || getUserPrimaryRoleFromToken(newToken);
+        setRole(roleFromToken);
+        
+        // Only store token, role comes from JWT
         localStorage.setItem("token", newToken);
-        localStorage.setItem("role", newRole);
+        // Remove old role storage
+        localStorage.removeItem("role");
     };
 
     const logout = () => {
         setToken(null);
         setRole(null);
         localStorage.removeItem("token");
-        localStorage.removeItem("role");
+        localStorage.removeItem("role"); // Clean up old role storage
         router.push("/login");
     };
 

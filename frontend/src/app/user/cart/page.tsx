@@ -21,8 +21,9 @@ import {
 } from "lucide-react";
 import {SellerInfo} from "@/types/ProductSeller";
 import {LoadingPage} from "@/components/LoadingPage";
+import api from "@/utils/axios";
 import axios from "axios";
-import UserNavbar from "@/components/UserNavbar";
+import UserNavbar from "@/components/user/UserNavbar";
 import { orderService } from "@/services/orderService";
 import { getUserIdFromToken } from "@/utils/jwtUtils";
 import { OrderRequestBody } from "@/types/Order";
@@ -55,19 +56,11 @@ export default function CartPage() {
 
             try {
                 setPageLoading(true);
-                const response = await axios.get<SellerInfo>(`/api/seller/products/seller/${currentSellerId}`, {
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
+                const response = await api.get<SellerInfo>(`/api/seller/products/seller/${currentSellerId}`);
                 setCurrentSeller(response.data);
             } catch (error) {
                 console.error("Failed to fetch seller details:", error);
-                // Handle unauthorized access
-                if (axios.isAxiosError(error) && (error.response?.status === 403 || error.response?.status === 401)) {
-                    logout();
-                }
+                // Auth errors are now handled by axios interceptor
             } finally {
                 setPageLoading(false);
             }

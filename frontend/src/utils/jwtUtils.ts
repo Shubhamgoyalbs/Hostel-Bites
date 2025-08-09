@@ -14,7 +14,7 @@ interface JWTPayload {
     exp: number;        // Expiration timestamp (seconds)
     iat: number;        // Issued at timestamp (seconds)
     type?: string;      // Token type (e.g., "refresh" for refresh tokens)
-    [key: string]: any; // Allow additional custom claims
+    [key: string]: unknown; // Allow additional custom claims
 }
 
 /**

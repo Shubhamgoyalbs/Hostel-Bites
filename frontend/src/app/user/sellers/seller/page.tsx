@@ -2,7 +2,7 @@
 
 import {Product} from "@/types/Product";
 import {SellerInfo} from "@/types/ProductSeller";
-import {ProductCardS} from "@/components/ProductCardS";
+import {ProductCardS} from "@/components/user/ProductCardS";
 import {
     Banknote,
     Building2,
@@ -19,9 +19,10 @@ import {
 } from "lucide-react";
 import {useRouter, useSearchParams} from "next/navigation";
 import {useEffect, useMemo, useState, Suspense} from "react";
-import UserNavbar from "@/components/UserNavbar";
+import UserNavbar from "@/components/user/UserNavbar";
 import {useAuth} from "@/context/AuthContext";
 import {useCart} from "@/context/CartContext";
+import api from "@/utils/axios";
 import axios from "axios";
 import {LoadingPage} from "@/components/LoadingPage";
 
@@ -51,21 +52,11 @@ function SellerDetailContent() {
         const fetchSellerData = async () => {
             try {
                 // Fetch seller details
-                const sellerResponse = await axios.get<SellerInfo>(`/api/seller/products/seller/${sellerId}`, {
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
+                const sellerResponse = await api.get<SellerInfo>(`/api/seller/products/seller/${sellerId}`);
                 setSeller(sellerResponse.data);
 
                 // Fetch products for the seller
-                const productsResponse = await axios.get<Product[]>(`/api/seller/products/all/${sellerId}`, {
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
+                const productsResponse = await api.get<Product[]>(`/api/seller/products/all/${sellerId}`);
                 setProducts(productsResponse.data);
 
             } catch (error) {

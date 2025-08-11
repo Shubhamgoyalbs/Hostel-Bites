@@ -6,6 +6,9 @@
 
 Hostel-Bites is a full-stack web application designed to revolutionize food ordering in hostel environments. Students can easily browse, order, and enjoy their favorite snacks and meals from various sellers operating within their hostel, making campus dining more convenient and accessible.
 
+**Live Demo:**  
+You can access the deployed website here: [https://frontend-orpin-omega-27.vercel.app/](https://frontend-orpin-omega-27.vercel.app/)
+
 ## Features
 
 - **User Management**: Role-based authentication (Students, Sellers, Admin)

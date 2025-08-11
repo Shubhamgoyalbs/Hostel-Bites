@@ -435,25 +435,6 @@ For production deployment, use environment variables:
 - `DB_PASSWORD`: Database password  
 - `JWT_SECRET`: JWT secret key
 
-## 🧪 Testing
-
-### Running Tests
-```bash
-# Run all tests
-mvn test
-
-# Run specific test class
-mvn test -Dtest=ProductsUserControllerTest
-
-# Run tests with coverage
-mvn test jacoco:report
-```
-
-### Test Structure
-- **Unit Tests**: Service layer testing
-- **Integration Tests**: Controller testing with MockMvc
-- **Repository Tests**: Data layer testing
-
 ## 📝 Development Guidelines
 
 ### Code Style
